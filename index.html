@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizApp</title>
+    <style>
+        *{
+    margin: 0;
+    padding: 0;
+    font-family: monospace;
+    box-sizing: border-box;
+} 
+body{ 
+    background: linear-gradient(90deg, #f6f8f8fd, hsl(330, 12%, 93%));
+}
+
+.quiz{
+    padding: 30px 0;
+}
+.quiz h2{
+    font-size: 18px;
+    color: rgb(25, 25, 27);
+}
+.btn{
+    background: #fff;
+    color: #222;
+    width: 100%;
+    border: 1px solid #222;
+    padding: 10px;
+    font-weight: 600;
+    margin: 10px 0;
+    text-align: left;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: .4s;
+}
+.btn:hover:not([disabled]){
+    background: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
+}
+.btn:disabled{
+    cursor: no-drop;
+}
+#next-btn{
+    background: rgb(0, 0, 12);
+    color: rgb(255, 255, 255);
+    font-weight: 500;
+    width: 150px;
+    border: 0;
+    padding: 10px;
+    margin: 20px auto 0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+
+}
+#back-btn{
+    background: rgb(1, 15, 1);
+    color: white;
+    font-weight: 500;
+    width: 150px;
+    border: 0;
+    padding: 10px;
+    margin: 20px auto 0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: none;
+}
+
+.correct{
+    background: #9aeabc;
+}
+.incorrect{
+    background: #ff9393;
+}
+.bttn{
+    display: flex;
+}
+    </style>
+</head>
+<body>
+    <div class="app">
+        <h1> Quiz</h1>
+        <div class="quiz">
+            <h2 id="question">Text</h2>
+            <div id="answer-buttons">
+                <button class="btn">1</button>
+                <button class="btn">2</button>
+                <button class="btn">3</button>
+                <button class="btn">4</button>
+            </div>
+            <div class="bttn">
+                <button id="back-btn">Back</button>
+                <button id="next-btn">Next</button>
+            </div>
+        </div>
+        
+    </div>
+    <script >
+        const questions = [
+    {
+        question: "Arrays in JavaScript are defined by which of the following statements?",
+        answers: [
+            {text: "It is an ordered list of functions", state: false},
+            {text: "It is an ordered list of string", state: false},
+            {text: "It is an ordered list of objects", state: false},
+            {text: "It is an ordered list of values", state: true},
+        ]
+    },
+    {
+        question: " Which of the following is not javascript data types?",
+        answers: [
+            {text: "Null type", state: false},
+            {text: "Undefinedtype", state: false},
+            {text: "Numbertype", state: false},
+            {text: "All of the mentioned", state: true},
+        ]
+    },
+    {
+        question: "Which of the following can be used to call a JavaScript Code Snippet?",
+        answers: [
+            {text: "Preprocessor", state: false},
+            {text: "Function/Method", state: true},
+            {text: "Triggering Event", state: false},
+            {text: "None of the above", state: false},
+        ]
+    },
+    {
+        question: " Which of the following methods/operation does javascript use instead of == and !=??",
+        answers: [
+            {text: "JavaScript uses === and !== instead", state: true},
+            {text: "JavaScript uses bitwise checking", state: false},
+            {text: "JavaScript uses equals() and notequals() instead", state: false},
+            {text: "JavaScript uses equalto()", state: false},
+        ]
+    },
+    {
+        question: "Which of the following is not a framework?",
+        answers: [
+            {text: "JavaScript .NET", state: false},
+            {text: "Cocoa JS", state: false},
+            {text: "JavaScript", state: true},
+            {text: "jQuery", state: false},
+        ]
+    },
+    {
+        question: "The 'function' and 'var' are known as:?",
+        answers: [
+            {text: "Keywords", state: false},
+            {text: "Declaration statements", state: true},
+            {text: "Data types", state: false},
+            {text: "Prototypes", state: false},
+        ]
+    },
+    {
+        question: "Who was the Creator of JavaScript?",
+        answers: [
+            {text: "Andrew Tate", state: false},
+            {text: "ElonMusk", state: false},
+            {text: "Tristian Talisman", state: false},
+            {text: "Brendan Erich", state: true},
+        ]
+    },
+    {
+        question: "Which of the following methods is used to access HTML elements using Javascript??",
+        answers: [
+            {text: "getElementbyId()", state: false},
+            {text: "getElementByClassName()", state: false},
+            {text: "Both A and B", state: true},
+            {text: "None of the above", state: false},
+        ]
+    },
+    {
+        question: "In Which Year, JavaScript was Developed?",
+        answers: [
+            {text: "1998", state: false},
+            {text: "1975", state: false},
+            {text: "1995", state: true},
+            {text: "1988", state: false},
+        ]
+    },
+    {
+        question: "Which of the Following is a Ternary Operator?",
+        answers: [
+            {text: "?", state: true},
+            {text: ":", state: false},
+            {text: "-", state: false},
+            {text: "+", state: false},
+        ]
+    }
+];
+const questionElement = document.getElementById("question");
+const answerButtons = document.getElementById("answer-buttons");
+const nextButton = document.getElementById("next-btn");
+const backButton = document.getElementById("back-btn");
+
+let currentQuestionIndex = 0;
+let score = 0;
+function startQuiz(){
+    currentQuestionIndex = 0;
+    score = 0;
+    nextButton.innerHTML = "Next";
+    showQuestion();
+}
+function showQuestion(){
+    resetState();
+    let currentQuestion = questions[currentQuestionIndex];
+    let questionNo = currentQuestionIndex + 1;
+    questionElement.innerHTML = questionNo +".) "+ currentQuestion.question;
+
+    currentQuestion.answers.forEach(answer => {
+        const button = document.createElement("button");
+        button.innerHTML = answer.text;
+        button.classList.add("btn");
+        answerButtons.appendChild(button);
+        if(answer.state){
+            button.dataset.state = answer.state;
+        }
+        button.addEventListener("click",selectAnswer);
+    });
+}
+
+function resetState(){
+    nextButton.style.display = "none";
+    backButton.style.display= "none";
+    while(answerButtons.firstChild){
+        answerButtons.removeChild(answerButtons.firstChild);
+    }
+}
+
+function selectAnswer(e){
+    const selectedBtn = e.target;
+    const isCorrect = selectedBtn.dataset.state === "true";
+    if(isCorrect){
+        selectedBtn.classList.add("correct");
+        score++;
+    }
+    else{
+        selectedBtn.classList.add("incorrect");
+    }
+    Array.from(answerButtons.children).forEach(button => {
+        if(button.dataset.state === "true"){
+            button.classList.add("correct");
+        }
+        button.disabled = true;
+    });
+    nextButton.style.display = "block";
+    backButton.style.display = "block";
+
+}
+
+function showScore(){
+    resetState();
+    questionElement.innerHTML = `Your Score is ${score}`;
+    nextButton.innerHTML = "Attend Quiz Again";
+    nextButton.style.display = "block"
+}
+
+function handleNextButton(){
+    currentQuestionIndex++;
+    if(currentQuestionIndex < questions.length){
+        showQuestion();
+    }
+    else{
+        showScore();
+    }
+}
+function handleBackButton(){
+    currentQuestionIndex--;
+    if(currentQuestionIndex < questions.length){
+        showQuestion();
+    }
+    else{
+        showScore();
+    }
+}
+nextButton.addEventListener("click", ()=> {
+    if(currentQuestionIndex < questions.length){
+        handleNextButton();
+    }
+    else{
+        startQuiz();
+    }
+});
+backButton.addEventListener("click", ()=> {
+    if(currentQuestionIndex < questions.length){
+        handleBackButton();
+    }
+    else{
+        startQuiz();
+    }
+});
+
+
+
+startQuiz();
+    </script>
+</body>
+</html>
